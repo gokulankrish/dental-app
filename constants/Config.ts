@@ -1,23 +1,11 @@
 // constants/Config.ts
 const firebaseConfig = {
-  apiKey: "AIzaSyBaja9Oaus9kobKh5gCcs_4Zw0n2o01CZ4",
-  authDomain: "dental-chat-app-2a7fd.firebaseapp.com",
-  projectId: "dental-chat-app-2a7fd",
-  storageBucket: "dental-chat-app-2a7fd.firebasestorage.app",
-  messagingSenderId: "112519937828",
-  appId: "1:112519937828:web:7029c0789e0d77dcb5bdb1",
-  measurementId: "G-4SDGG5D3YM"
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key_here EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 };
 
 export const FIREBASE_CONFIG = {
   // PASTE YOUR FIREBASE CONFIG HERE
-  apiKey: "AIzaSyBaja9Oaus9kobKh5gCcs_4Zw0n2o01CZ4",
-  authDomain: "dental-chat-app-2a7fd.firebaseapp.com",
-  projectId: "dental-chat-app-2a7fd",
-  storageBucket: "dental-chat-app-2a7fd.firebasestorage.app",
-  messagingSenderId: "112519937828",
-  appId: "1:112519937828:web:7029c0789e0d77dcb5bdb1",
-  measurementId: "G-4SDGG5D3YM"
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key_here EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 };
 
 export const COLLECTIONS = {
