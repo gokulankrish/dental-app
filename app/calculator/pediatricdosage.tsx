@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useState, useEffect } from 'react';
+
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Animated, Easing } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Pill, Weight, Cake, Calculator, RotateCcw, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -173,6 +174,13 @@ export default function PediatricDosageCalculator() {
   const [result, setResult] = useState<any>(null);
   const [availableStrengths, setAvailableStrengths] = useState<Array<{label: string, value: string}>>([]);
 
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const resultFadeAnim = useRef(new Animated.Value(0)).current;
+  const resultScaleAnim = useRef(new Animated.Value(0.95)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
   const formTypes = [
     { label: 'Syrup (mg/5 mL)', value: 'syrup' },
     { label: 'Suspension (mg/5 mL)', value: 'susp' },
@@ -183,6 +191,21 @@ export default function PediatricDosageCalculator() {
   ];
 
   useEffect(() => {
+    // Initial entrance animation
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      })
+    ]).start();
+
     updateFreqOptions();
     updateFormOptions();
   }, [selectedDrug]);
@@ -374,6 +397,37 @@ export default function PediatricDosageCalculator() {
     };
   };
 
+  const animateButtonPress = () => {
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      })
+    ]).start();
+  };
+
+  const animateResultIn = () => {
+    Animated.parallel([
+      Animated.timing(resultFadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultScaleAnim, {
+        toValue: 1,
+        duration: 600,
+        easing: Easing.out(Easing.back(1.5)),
+        useNativeDriver: true,
+      })
+    ]).start();
+  };
+
   const calculateDosage = () => {
     if (!weight) {
       Alert.alert('Error', 'Please enter weight.');
@@ -487,17 +541,31 @@ export default function PediatricDosageCalculator() {
     }
 
     setResult(calculationResult);
+    animateResultIn();
   };
 
   const resetForm = () => {
-    setSelectedDrug(0);
-    setWeight('');
-    setAge('');
-    setCustomFreq('');
-    setResult(null);
-    setMethod('mgkg');
-    setFormType('syrup');
-    setFormStrength('');
+    Animated.sequence([
+      Animated.timing(resultFadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultScaleAnim, {
+        toValue: 0.95,
+        duration: 300,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      setSelectedDrug(0);
+      setWeight('');
+      setAge('');
+      setCustomFreq('');
+      setResult(null);
+      setMethod('mgkg');
+      setFormType('syrup');
+      setFormStrength('');
+    });
   };
 
   const goBack = () => {
@@ -507,290 +575,333 @@ export default function PediatricDosageCalculator() {
   const currentDrug = DRUGS[selectedDrug];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.header}>
-
-        <Text style={styles.title}>Pediatric Dosage Calculator</Text>
-        <View style={styles.iconContainer}>
-          <Pill size={32} color="#0066cc" />
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <Animated.View style={[styles.animatedContainer, {
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }]
+      }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Pediatric Dosage Calculator</Text>
         </View>
-      </View>
 
-      <View style={styles.disclaimerContainer}>
-        <AlertTriangle size={20} color="#e68a00" />
-        <Text style={styles.disclaimerText}>
-          This calculator is for educational purposes only and should not replace professional medical advice. Always consult a healthcare provider before administering medication.
-        </Text>
-      </View>
+        <Animated.View style={[styles.disclaimerContainer, {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }]}>
+          <AlertTriangle size={20} color="#e68a00" />
+          <Text style={styles.disclaimerText}>
+            This calculator is for educational purposes only and should not replace professional medical advice. Always consult a healthcare provider before administering medication.
+          </Text>
+        </Animated.View>
 
-      <View style={styles.formContainer}>
-        <View style={styles.gridContainer}>
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Age (years)</Text>
-            <TextInput
-              style={styles.input}
-              value={age}
-              onChangeText={setAge}
-              keyboardType="numeric"
-              placeholder="e.g., 5"
-              placeholderTextColor="#9ca3af"
-            />
-            <Text style={styles.inputNote}>Age used for age-gates (doxycycline / tramadol warnings)</Text>
-          </View>
+        <View style={styles.formContainer}>
+          <View style={styles.gridContainer}>
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <View style={styles.labelContainer}>
+                <Cake size={16} color="#0066cc" />
+                <Text style={styles.label}>Age (years)</Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                value={age}
+                onChangeText={setAge}
+                keyboardType="numeric"
+                placeholder="e.g., 5"
+                placeholderTextColor="#9ca3af"
+              />
+              <Text style={styles.inputNote}>Age used for age-gates (doxycycline / tramadol warnings)</Text>
+            </Animated.View>
 
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Weight (kg) *</Text>
-            <TextInput
-              style={styles.input}
-              value={weight}
-              onChangeText={setWeight}
-              keyboardType="numeric"
-              placeholder="e.g., 15"
-              placeholderTextColor="#9ca3af"
-            />
-            <Text style={styles.inputNote}>Weight used for mg/kg calculations</Text>
-          </View>
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <View style={styles.labelContainer}>
+                <Weight size={16} color="#0066cc" />
+                <Text style={styles.label}>Weight (kg) *</Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                value={weight}
+                onChangeText={setWeight}
+                keyboardType="numeric"
+                placeholder="e.g., 15"
+                placeholderTextColor="#9ca3af"
+              />
+              <Text style={styles.inputNote}>Weight used for mg/kg calculations</Text>
+            </Animated.View>
 
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Medicine</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedDrug}
-                onValueChange={(itemValue) => setSelectedDrug(itemValue)}
-                style={styles.picker}
-              >
-                {DRUGS.map((drug, index) => (
-                  <Picker.Item key={index} label={drug.name} value={index} />
-                ))}
-              </Picker>
-            </View>
-            {currentDrug?.note && (
-              <Text style={styles.inputNote}>{currentDrug.note}</Text>
-            )}
-          </View>
-
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Calculation method</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={method}
-                onValueChange={(itemValue) => setMethod(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="mg/kg (AAPD targets)" value="mgkg" />
-                <Picker.Item label="Clark's Rule (derive from adult dose)" value="clark" />
-              </Picker>
-            </View>
-            <Text style={styles.inputNote}>Clark's Rule uses adult product dose × (weight (lbs)/150).</Text>
-          </View>
-
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Frequency</Text>
-            <View style={styles.rowContainer}>
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <View style={styles.labelContainer}>
+                <Pill size={16} color="#0066cc" />
+                <Text style={styles.label}>Medicine</Text>
+              </View>
               <View style={styles.pickerContainer}>
                 <Picker
-                  selectedValue={frequency}
-                  onValueChange={(itemValue) => setFrequency(itemValue)}
+                  selectedValue={selectedDrug}
+                  onValueChange={(itemValue) => setSelectedDrug(itemValue)}
                   style={styles.picker}
                 >
-                  {currentDrug?.freqs.map((freq) => (
+                  {DRUGS.map((drug, index) => (
                     <Picker.Item 
-                      key={freq} 
-                      label={FREQS[freq as keyof typeof FREQS]?.label || freq} 
-                      value={freq} 
+                      key={index} 
+                      label={drug.name} 
+                      value={index} 
+                      color="#0b1a2b"
                     />
                   ))}
                 </Picker>
               </View>
-              <TextInput
-                style={[styles.input, styles.customFreqInput]}
-                value={customFreq}
-                onChangeText={setCustomFreq}
-                keyboardType="numeric"
-                placeholder="custom/day"
-                placeholderTextColor="#9ca3af"
-              />
-            </View>
-            <Text style={styles.inputNote}>Leave custom empty to use the preset frequency.</Text>
-          </View>
+              {currentDrug?.note && (
+                <Text style={styles.inputNote}>{currentDrug.note}</Text>
+              )}
+            </Animated.View>
 
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Formulation</Text>
-            <View style={styles.rowContainer}>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={formType}
-                  onValueChange={(itemValue) => setFormType(itemValue)}
-                  style={styles.picker}
-                >
-                  {formTypes.map((type) => (
-                    <Picker.Item key={type.value} label={type.label} value={type.value} />
-                  ))}
-                </Picker>
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <View style={styles.labelContainer}>
+                <Calculator size={16} color="#0066cc" />
+                <Text style={styles.label}>Calculation method</Text>
               </View>
               <View style={styles.pickerContainer}>
                 <Picker
-                  selectedValue={formStrength}
-                  onValueChange={(itemValue) => setFormStrength(itemValue)}
+                  selectedValue={method}
+                  onValueChange={(itemValue) => setMethod(itemValue)}
                   style={styles.picker}
                 >
-                  {availableStrengths.map((strength) => (
-                    <Picker.Item key={strength.value} label={strength.label} value={strength.value} />
-                  ))}
+                  <Picker.Item label="mg/kg (AAPD targets)" value="mgkg" color="#0b1a2b" />
+                  <Picker.Item label="Clark's Rule (derive from adult dose)" value="clark" color="#0b1a2b" />
                 </Picker>
               </View>
-            </View>
-            {currentDrug?.type === "amoxClav" && (
-              <Text style={styles.inputNote}>Conversions use the amoxicillin component.</Text>
-            )}
-          </View>
-        </View>
+              <Text style={styles.inputNote}>Clark's Rule uses adult product dose × (weight (lbs)/150).</Text>
+            </Animated.View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={calculateDosage} activeOpacity={0.8}>
-            <LinearGradient
-              colors={['#0066cc', '#004499']}
-              style={styles.calculateButton}
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <Text style={styles.label}>Frequency</Text>
+              <View style={styles.rowContainer}>
+                <View style={[styles.pickerContainer, { flex: 2 }]}>
+                  <Picker
+                    selectedValue={frequency}
+                    onValueChange={(itemValue) => setFrequency(itemValue)}
+                    style={styles.picker}
+                  >
+                    {currentDrug?.freqs.map((freq) => (
+                      <Picker.Item 
+                        key={freq} 
+                        label={FREQS[freq as keyof typeof FREQS]?.label || freq} 
+                        value={freq} 
+                        color="#0b1a2b"
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                <TextInput
+                  style={[styles.input, styles.customFreqInput]}
+                  value={customFreq}
+                  onChangeText={setCustomFreq}
+                  keyboardType="numeric"
+                  placeholder="custom/day"
+                  placeholderTextColor="#9ca3af"
+                />
+              </View>
+              <Text style={styles.inputNote}>Leave custom empty to use the preset frequency.</Text>
+            </Animated.View>
+
+            <Animated.View style={[styles.inputCard, styles.cardElevated]}>
+              <Text style={styles.label}>Formulation</Text>
+              <View style={styles.columnContainer}>
+                <View style={[styles.pickerContainer, { marginBottom: 8 }]}>
+                  <Picker
+                    selectedValue={formType}
+                    onValueChange={(itemValue) => setFormType(itemValue)}
+                    style={styles.picker}
+                  >
+                    {formTypes.map((type) => (
+                      <Picker.Item key={type.value} label={type.label} value={type.value} color="#0b1a2b" />
+                    ))}
+                  </Picker>
+                </View>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={formStrength}
+                    onValueChange={(itemValue) => setFormStrength(itemValue)}
+                    style={styles.picker}
+                  >
+                    {availableStrengths.map((strength) => (
+                      <Picker.Item key={strength.value} label={strength.label} value={strength.value} color="#0b1a2b" />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+              {currentDrug?.type === "amoxClav" && (
+                <Text style={styles.inputNote}>Conversions use the amoxicillin component.</Text>
+              )}
+            </Animated.View>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <TouchableOpacity 
+                onPress={() => {
+                  animateButtonPress();
+                  calculateDosage();
+                }} 
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#0066cc', '#004499']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.calculateButton}
+                >
+                  <Calculator size={20} color="#fff" />
+                  <Text style={styles.buttonText}>Calculate Dosage</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+
+            <TouchableOpacity 
+              onPress={resetForm} 
+              style={styles.resetButton}
+              activeOpacity={0.7}
             >
-              <Calculator size={20} color="#fff" />
-              <Text style={styles.buttonText}>Calculate</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <RotateCcw size={20} color="#6b7280" />
+              <Text style={styles.resetButtonText}>Reset Form</Text>
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity onPress={resetForm} style={styles.resetButton}>
-            <RotateCcw size={20} color="#6b7280" />
-            <Text style={styles.resetButtonText}>Reset</Text>
-          </TouchableOpacity>
+          {result && (
+            <Animated.View style={[styles.resultContainer, {
+              opacity: resultFadeAnim,
+              transform: [{ scale: resultScaleAnim }]
+            }]}>
+              <Text style={styles.resultTitle}>📊 Calculated Dosage</Text>
+              
+              <View style={styles.kpiContainer}>
+                {result.type === 'combo' ? (
+                  <>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Per-dose range</Text>
+                      <Text style={styles.kpiValue}>
+                        Para: {(COMPONENTS.Paracetamol.mgkgDose[0] * parseFloat(weight)).toFixed(0)}–{(COMPONENTS.Paracetamol.mgkgDose[1] * parseFloat(weight)).toFixed(0)} mg
+                      </Text>
+                      <Text style={styles.kpiValue}>
+                        Ibu: {(COMPONENTS.Ibuprofen.mgkgDose[0] * parseFloat(weight)).toFixed(0)}–{(COMPONENTS.Ibuprofen.mgkgDose[1] * parseFloat(weight)).toFixed(0)} mg
+                      </Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Suggested</Text>
+                      <Text style={styles.kpiValue}>
+                        Para: {Math.round(result.pTarget)} mg
+                      </Text>
+                      <Text style={styles.kpiValue}>
+                        Ibu: {Math.round(result.iTarget)} mg
+                      </Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Administer</Text>
+                      <Text style={styles.kpiValue}>{result.adminText}</Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Total /24h</Text>
+                      <Text style={styles.kpiValue}>
+                        Para: {result.totalPara.toFixed(0)} mg
+                      </Text>
+                      <Text style={styles.kpiValue}>
+                        Ibu: {result.totalIbu.toFixed(0)} mg
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Per-dose range</Text>
+                      <Text style={styles.kpiValue}>{result.doseRange}</Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Suggested</Text>
+                      <Text style={styles.kpiValue}>{result.suggested}</Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Administer</Text>
+                      <Text style={styles.kpiValue}>{result.adminText}</Text>
+                    </View>
+                    <View style={[styles.kpiPill, styles.kpiElevated]}>
+                      <Text style={styles.kpiLabel}>Total /24h</Text>
+                      <Text style={styles.kpiValue}>{result.totalDay}</Text>
+                    </View>
+                  </>
+                )}
+              </View>
+
+              <View style={styles.resultDetails}>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>Drug:</Text>
+                  <Text style={styles.resultValue}>{result.drugName}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>Class:</Text>
+                  <Text style={styles.resultValue}>{result.drugClass}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>Method:</Text>
+                  <Text style={styles.resultValue}>{result.method}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>Frequency:</Text>
+                  <Text style={styles.resultValue}>{result.frequency}</Text>
+                </View>
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>Weight:</Text>
+                  <Text style={styles.resultValue}>{result.weight} kg</Text>
+                </View>
+                {result.age && (
+                  <View style={styles.resultItem}>
+                    <Text style={styles.resultLabel}>Age:</Text>
+                    <Text style={styles.resultValue}>{result.age} years</Text>
+                  </View>
+                )}
+              </View>
+
+              {result.type === 'combo' && (
+                <View style={styles.comboDetails}>
+                  <Text style={styles.comboDetailsTitle}>Combo calculation details (target vs achieved)</Text>
+                  <View style={styles.comboTable}>
+                    <View style={styles.tableHeader}>
+                      <Text style={styles.tableHeaderText}>Component</Text>
+                      <Text style={styles.tableHeaderText}>Target/dose</Text>
+                      <Text style={styles.tableHeaderText}>Achieved/dose</Text>
+                      <Text style={styles.tableHeaderText}>% of target</Text>
+                    </View>
+                    <View style={styles.tableRow}>
+                      <Text style={styles.tableCellText}>Paracetamol</Text>
+                      <Text style={styles.tableCellText}>{Math.round(result.pTarget)} mg</Text>
+                      <Text style={styles.tableCellText}>{Math.round(result.achievedPara)} mg</Text>
+                      <Text style={styles.tableCellText}>
+                        {result.pTarget > 0 ? (result.achievedPara / result.pTarget * 100).toFixed(0) : 0}%
+                      </Text>
+                    </View>
+                    <View style={styles.tableRow}>
+                      <Text style={styles.tableCellText}>Ibuprofen</Text>
+                      <Text style={styles.tableCellText}>{Math.round(result.iTarget)} mg</Text>
+                      <Text style={styles.tableCellText}>{Math.round(result.achievedIbu)} mg</Text>
+                      <Text style={styles.tableCellText}>
+                        {result.iTarget > 0 ? (result.achievedIbu / result.iTarget * 100).toFixed(0) : 0}%
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </Animated.View>
+          )}
         </View>
 
-        {result && (
-          <View style={styles.resultContainer}>
-            <Text style={styles.resultTitle}>Calculated Dosage</Text>
-            
-            <View style={styles.kpiContainer}>
-              {result.type === 'combo' ? (
-                <>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Per-dose range</Text>
-                    <Text style={styles.kpiValue}>
-                      Para: {(COMPONENTS.Paracetamol.mgkgDose[0] * parseFloat(weight)).toFixed(0)}–{(COMPONENTS.Paracetamol.mgkgDose[1] * parseFloat(weight)).toFixed(0)} mg
-                    </Text>
-                    <Text style={styles.kpiValue}>
-                      Ibu: {(COMPONENTS.Ibuprofen.mgkgDose[0] * parseFloat(weight)).toFixed(0)}–{(COMPONENTS.Ibuprofen.mgkgDose[1] * parseFloat(weight)).toFixed(0)} mg
-                    </Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Suggested</Text>
-                    <Text style={styles.kpiValue}>
-                      Para: {Math.round(result.pTarget)} mg
-                    </Text>
-                    <Text style={styles.kpiValue}>
-                      Ibu: {Math.round(result.iTarget)} mg
-                    </Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Administer</Text>
-                    <Text style={styles.kpiValue}>{result.adminText}</Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Total /24h</Text>
-                    <Text style={styles.kpiValue}>
-                      Para: {result.totalPara.toFixed(0)} mg
-                    </Text>
-                    <Text style={styles.kpiValue}>
-                      Ibu: {result.totalIbu.toFixed(0)} mg
-                    </Text>
-                  </View>
-                </>
-              ) : (
-                <>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Per-dose range</Text>
-                    <Text style={styles.kpiValue}>{result.doseRange}</Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Suggested</Text>
-                    <Text style={styles.kpiValue}>{result.suggested}</Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Administer</Text>
-                    <Text style={styles.kpiValue}>{result.adminText}</Text>
-                  </View>
-                  <View style={styles.kpiPill}>
-                    <Text style={styles.kpiLabel}>Total /24h</Text>
-                    <Text style={styles.kpiValue}>{result.totalDay}</Text>
-                  </View>
-                </>
-              )}
-            </View>
-
-            <View style={styles.resultDetails}>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>Drug:</Text>
-                <Text style={styles.resultValue}>{result.drugName}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>Class:</Text>
-                <Text style={styles.resultValue}>{result.drugClass}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>Method:</Text>
-                <Text style={styles.resultValue}>{result.method}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>Frequency:</Text>
-                <Text style={styles.resultValue}>{result.frequency}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>Weight:</Text>
-                <Text style={styles.resultValue}>{result.weight} kg</Text>
-              </View>
-              {result.age && (
-                <View style={styles.resultItem}>
-                  <Text style={styles.resultLabel}>Age:</Text>
-                  <Text style={styles.resultValue}>{result.age} years</Text>
-                </View>
-              )}
-            </View>
-
-            {result.type === 'combo' && (
-              <View style={styles.comboDetails}>
-                <Text style={styles.comboDetailsTitle}>Combo calculation details (target vs achieved)</Text>
-                <View style={styles.comboTable}>
-                  <View style={styles.tableHeader}>
-                    <Text style={styles.tableHeaderText}>Component</Text>
-                    <Text style={styles.tableHeaderText}>Target/dose</Text>
-                    <Text style={styles.tableHeaderText}>Achieved/dose</Text>
-                    <Text style={styles.tableHeaderText}>% of target</Text>
-                  </View>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableCellText}>Paracetamol</Text>
-                    <Text style={styles.tableCellText}>{Math.round(result.pTarget)} mg</Text>
-                    <Text style={styles.tableCellText}>{Math.round(result.achievedPara)} mg</Text>
-                    <Text style={styles.tableCellText}>
-                      {result.pTarget > 0 ? (result.achievedPara / result.pTarget * 100).toFixed(0) : 0}%
-                    </Text>
-                  </View>
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableCellText}>Ibuprofen</Text>
-                    <Text style={styles.tableCellText}>{Math.round(result.iTarget)} mg</Text>
-                    <Text style={styles.tableCellText}>{Math.round(result.achievedIbu)} mg</Text>
-                    <Text style={styles.tableCellText}>
-                      {result.iTarget > 0 ? (result.achievedIbu / result.iTarget * 100).toFixed(0) : 0}%
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Designed & Developed by <Text style={styles.footerLink}>Dr Aafirin...</Text>
-        </Text>
-      </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Designed & Developed by <Text style={styles.footerLink}>Dr Aafirin...</Text>
+          </Text>
+        </View>
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -802,25 +913,36 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    paddingTop: 10,
+    paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 40,
+  },
+  animatedContainer: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 24,
   },
   backButton: {
     padding: 8,
+    backgroundColor: 'rgba(0, 102, 204, 0.1)',
+    borderRadius: 10,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#0b1a2b',
     flex: 1,
     textAlign: 'center',
+    letterSpacing: -0.5,
+    
   },
   subtitle: {
     textAlign: 'center',
@@ -837,228 +959,291 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     backgroundColor: '#fff7ed',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     borderLeftWidth: 4,
     borderLeftColor: '#e68a00',
-    marginBottom: 20,
-    gap: 10,
+    marginBottom: 24,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   disclaimerText: {
     flex: 1,
     fontSize: 14,
     color: '#92400e',
     lineHeight: 20,
+    fontWeight: '500',
   },
   formContainer: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 24,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
+    marginBottom: 24,
   },
   gridContainer: {
     gap: 16,
   },
   inputCard: {
-    backgroundColor: '#f7fbff',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
     borderWidth: 1,
-    borderColor: '#c0d6ec',
+    borderColor: '#e2f0fb',
+  },
+  cardElevated: {
+    shadowColor: '#0066cc',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#4a6078',
-    marginBottom: 8,
+    color: '#1e40af',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#c0d6ec',
-    borderRadius: 8,
-    padding: 12,
+    borderWidth: 2,
+    borderColor: '#e2f0fb',
+    borderRadius: 12,
+    padding: 14,
     fontSize: 16,
-    backgroundColor: '#f7fbff',
+    backgroundColor: '#f8fafc',
     color: '#0b1a2b',
+    fontWeight: '500',
   },
   inputNote: {
     fontSize: 12,
-    color: '#4a6078',
-    marginTop: 4,
+    color: '#6b7280',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
   pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#c0d6ec',
-    borderRadius: 8,
-    backgroundColor: '#f7fbff',
+    borderWidth: 2,
+    borderColor: '#e2f0fb',
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    overflow: 'hidden',
   },
   picker: {
     height: 50,
     color: '#0b1a2b',
+    fontWeight: '500',
   },
   rowContainer: {
     flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+  },
+  columnContainer: {
     gap: 8,
   },
   customFreqInput: {
     flex: 1,
+    height: 50,
   },
   buttonContainer: {
-    gap: 12,
-    marginTop: 24,
+    gap: 16,
+    marginTop: 32,
   },
   calculateButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 16,
+    gap: 12,
+    paddingVertical: 18,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
+    shadowColor: '#0066cc',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '700',
+    letterSpacing: 0.5,
   },
   resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
+    gap: 10,
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 2,
     borderColor: '#d1d5db',
-    backgroundColor: '#aaa',
+    backgroundColor: '#ffffff',
   },
   resetButtonText: {
-    color: '#fff',
+    color: '#6b7280',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   resultContainer: {
-    marginTop: 24,
-    padding: 20,
-    backgroundColor: '#eff6ff',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#0066cc',
+    marginTop: 32,
+    padding: 24,
+    backgroundColor: 'linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#dbeafe',
+    shadowColor: '#0066cc',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
   },
   resultTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0066cc',
-    marginBottom: 16,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1e40af',
+    marginBottom: 24,
     textAlign: 'center',
+    letterSpacing: -0.3,
   },
   kpiContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 20,
+    gap: 16,
+    marginBottom: 24,
   },
   kpiPill: {
-    backgroundColor: '#f0f7ff',
-    borderRadius: 10,
-    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
     flex: 1,
-    minWidth: 140,
+    minWidth: 160,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+  },
+  kpiElevated: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
   },
   kpiLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#4a6078',
-    marginBottom: 4,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   kpiValue: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: '#0b1a2b',
     textAlign: 'center',
+    lineHeight: 22,
   },
   resultDetails: {
-    gap: 8,
+    gap: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#e2f0fb',
   },
   resultItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   resultLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 15,
+    fontWeight: '600',
     color: '#374151',
   },
   resultValue: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#0b1a2b',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   comboDetails: {
-    marginTop: 20,
-    padding: 16,
+    marginTop: 24,
+    padding: 20,
     backgroundColor: '#f8fafc',
-    borderRadius: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e2f0fb',
   },
   comboDetailsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#374151',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   comboTable: {
     borderWidth: 1,
-    borderColor: '#e2f0fb',
-    borderRadius: 8,
+    borderColor: '#dbeafe',
+    borderRadius: 12,
     overflow: 'hidden',
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#d9ebfa',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    backgroundColor: 'linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%)',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
   },
   tableHeaderText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#003366',
+    color: '#1e40af',
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
   tableRow: {
     flexDirection: 'row',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e2f0fb',
+    backgroundColor: '#ffffff',
   },
   tableCellText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 14,
     color: '#0b1a2b',
     textAlign: 'center',
+    fontWeight: '500',
   },
   footer: {
     marginTop: 20,
-    padding: 16,
+    padding: 20,
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#4a6078',
+    fontWeight: '500',
   },
   footerLink: {
     color: '#0066cc',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

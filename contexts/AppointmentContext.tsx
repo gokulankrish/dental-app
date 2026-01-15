@@ -205,3 +205,4 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     </AppointmentContext.Provider>
   );
 };
+
