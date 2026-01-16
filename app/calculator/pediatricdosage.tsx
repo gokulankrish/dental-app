@@ -896,11 +896,12 @@ export default function PediatricDosageCalculator() {
           )}
         </View>
 
-        <View style={styles.footer}>
+        {/* <View style={styles.footer}>
           <Text style={styles.footerText}>
             Designed & Developed by <Text style={styles.footerLink}>Dr Aafirin...</Text>
           </Text>
-        </View>
+        </View> */}
+        
       </Animated.View>
     </ScrollView>
   );
