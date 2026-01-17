@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "Aafirin-app",
-    "slug": "Aafirin-app",
+    "name": "Aafirin-dental-care",
+    "slug": "Aafirin-dental-care",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo-image.png",
     "scheme": "aafirinapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gokukrishnasorganization.aafirindentalapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +23,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.gokukrishnasorganization.aafirindentalapp"
     },
     "web": {
       "output": "static",
@@ -30,7 +35,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -43,6 +48,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9b512e61-8bc3-4d5b-a242-5fc4ddf3d288"
+      }
+    },
+    "owner": "gokukrishnas-organization"
   }
 }

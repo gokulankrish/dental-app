@@ -1,49 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   Alert,
-  TouchableOpacity
-} from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../hooks/useAuth';
-import { Colors } from '../../constants/Colors';
-import { USER_ROLES } from '../../constants/Config';
-import Avatar from '../../components/ui/Avatar';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+  TouchableOpacity,
+} from "react-native";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "../../hooks/useAuth";
+import { Colors } from "../../constants/Colors";
+import { USER_ROLES } from "../../constants/Config";
+import Avatar from "../../components/ui/Avatar";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 export default function ProfileScreen() {
   const { user, userData, logout, updateProfile, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(userData?.name || '');
-  const [phone, setPhone] = useState(userData?.phone || '');
-  const [specialty, setSpecialty] = useState(userData?.specialty || '');
-  const [experience, setExperience] = useState(userData?.experience || '');
+  const [name, setName] = useState(userData?.name || "");
+  const [phone, setPhone] = useState(userData?.phone || "");
+  const [specialty, setSpecialty] = useState(userData?.specialty || "");
+  const [experience, setExperience] = useState(userData?.experience || "");
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Logout', 
-          style: 'destructive',
-          onPress: async () => {
-            const result = await logout();
-            if (result.success) {
-              router.replace('/auth/login');
-            } else {
-              Alert.alert('Error', result.error || 'Failed to logout');
-            }
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          const result = await logout();
+          if (result.success) {
+            router.replace("/auth/login");
+          } else {
+            Alert.alert("Error", result.error || "Failed to logout");
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const handleSaveProfile = async () => {
@@ -53,55 +49,55 @@ export default function ProfileScreen() {
       name: name.trim(),
       phone: phone.trim(),
       specialty: specialty.trim(),
-      experience: experience.trim()
+      experience: experience.trim(),
     });
 
     if (result.success) {
-      Alert.alert('Success', 'Profile updated successfully');
+      Alert.alert("Success", "Profile updated successfully");
       setIsEditing(false);
     } else {
-      Alert.alert('Error', result.error || 'Failed to update profile');
+      Alert.alert("Error", result.error || "Failed to update profile");
     }
   };
 
   const handleCancelEdit = () => {
-    setName(userData?.name || '');
-    setPhone(userData?.phone || '');
-    setSpecialty(userData?.specialty || '');
-    setExperience(userData?.experience || '');
+    setName(userData?.name || "");
+    setPhone(userData?.phone || "");
+    setSpecialty(userData?.specialty || "");
+    setExperience(userData?.experience || "");
     setIsEditing(false);
   };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Avatar 
-          name={userData?.name || ''}
-          size={100}
-          textSize={36}
-        />
-        <Text style={styles.name}>{userData?.name || 'User'}</Text>
+        <Avatar name={userData?.name || ""} size={100} textSize={36} />
+        <Text style={styles.name}>{userData?.name || "User"}</Text>
         <Text style={styles.email}>{user?.email}</Text>
-        <View style={[
-          styles.roleBadge,
-          userData?.role === USER_ROLES.DOCTOR 
-            ? styles.doctorBadge 
-            : styles.patientBadge
-        ]}>
-          <Text style={[
-            styles.roleText,
-            userData?.role === USER_ROLES.DOCTOR 
-              ? styles.doctorText 
-              : styles.patientText
-          ]}>
-            {userData?.role === USER_ROLES.DOCTOR ? '👨‍⚕️ Doctor' : '👤 Patient'}
+        <View
+          style={[
+            styles.roleBadge,
+            userData?.role === USER_ROLES.DOCTOR
+              ? styles.doctorBadge
+              : styles.patientBadge,
+          ]}
+        >
+          <Text
+            style={[
+              styles.roleText,
+              userData?.role === USER_ROLES.DOCTOR
+                ? styles.doctorText
+                : styles.patientText,
+            ]}
+          >
+            {userData?.role === USER_ROLES.DOCTOR ? "👨‍⚕️ Doctor" : "👤 Patient"}
           </Text>
         </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account Information</Text>
-        
+
         {isEditing ? (
           <>
             <Input
@@ -155,13 +151,15 @@ export default function ProfileScreen() {
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Phone:</Text>
-              <Text style={styles.infoValue}>{userData?.phone || 'Not set'}</Text>
+              <Text style={styles.infoValue}>
+                {userData?.phone || "Not set"}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Role:</Text>
               <Text style={styles.infoValue}>
-                {userData?.role === USER_ROLES.DOCTOR ? 'Doctor' : 'Patient'}
+                {userData?.role === USER_ROLES.DOCTOR ? "Doctor" : "Patient"}
               </Text>
             </View>
 
@@ -207,33 +205,98 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Actions</Text>
-        
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="key" size={20} color={Colors.primary} />
-          <Text style={styles.actionButtonText}>Change Password</Text>
-          <Ionicons name="chevron-forward" size={20} Color={Colors.gray} />
-        </TouchableOpacity>
+<View style={styles.section}>
+  <Text style={styles.sectionTitle}>Account Actions</Text>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="notifications" size={20} color={Colors.primary} />
-          <Text style={styles.actionButtonText}>Notification Settings</Text>
-          <Ionicons name="chevron-forward" size={20} Color={Colors.gray} />
-        </TouchableOpacity>
+  <TouchableOpacity 
+    style={styles.actionButton}
+    onPress={() => {
+      Alert.alert(
+        "Coming Soon",
+        "Change password feature will be available in the next update.",
+        [{ text: "OK" }]
+      );
+    }}
+  >
+    <Ionicons name="key" size={20} color={Colors.primary} />
+    <Text style={styles.actionButtonText}>Change Password</Text>
+    <Ionicons name="chevron-forward" size={20} color={Colors.gray[100]} />
+  </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="shield" size={20} color={Colors.primary} />
-          <Text style={styles.actionButtonText}>Privacy Policy</Text>
-          <Ionicons name="chevron-forward" size={20} Color={Colors.gray} />
-        </TouchableOpacity>
+  {/* Notification Settings - Routes to Reminder Page */}
+  <TouchableOpacity 
+    style={styles.actionButton}
+    onPress={() => router.push("/calculator/reminder")} // or "/notifications" based on your route structure
+  >
+    <Ionicons name="notifications" size={20} color={Colors.primary} />
+    <Text style={styles.actionButtonText}>Notification Settings</Text>
+    <Ionicons name="chevron-forward" size={20} color={Colors.gray[100]} />
+  </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="document-text" size={20} color={Colors.primary} />
-          <Text style={styles.actionButtonText}>Terms of Service</Text>
-          <Ionicons name="chevron-forward" size={20} Color={Colors.gray} />
-        </TouchableOpacity>
-      </View>
+  {/* Privacy Policy - Shows Dummy Data */}
+  <TouchableOpacity 
+    style={styles.actionButton}
+    onPress={() => {
+      // You can use a modal, alert, or navigate to a dummy content page
+      Alert.alert(
+        "Privacy Policy",
+`By using this App, you agree to these Terms.
+
+The App supports dental communication, scheduling, and health summaries but is not a substitute for professional care.
+
+Users must provide accurate information and keep accounts secure.
+
+Personal data is protected under our Privacy Policy and shared only with authorized dental professionals.
+
+The App is provided “as is”; we are not liable for reliance on its information.`,
+        [{ text: "OK" }]
+      );
+      // OR navigate to a dummy page:
+      // router.push("/privacy-policy")
+    }}
+  >
+    <Ionicons name="shield" size={20} color={Colors.primary} />
+    <Text style={styles.actionButtonText}>Privacy Policy</Text>
+    <Ionicons name="chevron-forward" size={20} color={Colors.gray[100]} />
+  </TouchableOpacity>
+
+  {/* Terms of Service - Shows Dummy Data */}
+  <TouchableOpacity 
+    style={styles.actionButton}
+    onPress={() => {
+      // You can use a modal, alert, or navigate to a dummy content page
+      Alert.alert(
+        "Terms of Service",
+                `By using this App, you agree to these Terms of Service.
+
+The App supports dental care communication, scheduling, and health summaries.
+
+It does not replace professional dental diagnosis or treatment.
+
+Users must provide accurate information and keep login credentials secure.
+
+Personal data is handled per our Privacy Policy and shared only with chosen professionals.
+
+Appointment bookings depend on dentist availability; reminders are informational.
+
+Fees for premium services are non‑refundable unless stated otherwise.
+
+All App content and design are our intellectual property.
+
+We may suspend accounts for misuse, fraud, or violation of these Terms.
+
+The App is provided "as is"; we are not liable for reliance on its information.`,
+        [{ text: "OK" }]
+      );
+      // OR navigate to a dummy page:
+      // router.push("/terms-of-service")
+    }}
+  >
+    <Ionicons name="document-text" size={20} color={Colors.primary} />
+    <Text style={styles.actionButtonText}>Terms of Service</Text>
+    <Ionicons name="chevron-forward" size={20} color={Colors.gray[100]} />
+  </TouchableOpacity>
+</View>
 
       <Button
         title="Logout"
@@ -244,8 +307,8 @@ export default function ProfileScreen() {
       />
 
       <View style={styles.footer}>
-        <Text style={styles.version}>Dental Chat v1.0.0</Text>
-        <Text style={styles.copyright}>© 2024 Dental Health Solutions</Text>
+        <Text style={styles.version}>Aafirin Dental Care v1.0.0</Text>
+        <Text style={styles.copyright}>© 2026 Designed and developed by AG Team</Text>
       </View>
     </ScrollView>
   );
@@ -257,7 +320,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 30,
     backgroundColor: Colors.white,
     borderBottomWidth: 1,
@@ -265,7 +328,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.text,
     marginTop: 15,
     marginBottom: 5,
@@ -288,7 +351,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.patientBadge,
   },
   roleText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 14,
   },
   doctorText: {
@@ -306,14 +369,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.text,
     marginBottom: 20,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -327,11 +390,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     flex: 2,
-    textAlign: 'right',
+    textAlign: "right",
   },
   editButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
     gap: 10,
   },
@@ -339,8 +402,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -353,13 +416,13 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     margin: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
   footer: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 20,
   },
   version: {
@@ -372,4 +435,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-

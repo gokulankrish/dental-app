@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { colors } from '../../constants/Colors';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { colors } from "../../constants/Colors";
 
 export default function DoctorProfile() {
   return (
@@ -24,7 +24,7 @@ export default function DoctorProfile() {
           <View style={styles.profileCard}>
             <Image
               source={{
-                uri: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg',
+                uri: "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg",
               }}
               style={styles.profileImage}
             />
@@ -47,7 +47,7 @@ export default function DoctorProfile() {
           {/* Experience */}
           <View style={styles.infoCard}>
             <Text style={styles.sectionTitle}>Experience</Text>
-            <Text style={styles.infoText}>5+ Years</Text>
+            <Text style={styles.infoText}>3+ Years</Text>
           </View>
 
           {/* Reviews */}
@@ -62,6 +62,7 @@ export default function DoctorProfile() {
           <View style={styles.buttonsRow}>
             <TouchableOpacity
               style={[styles.actionButton, styles.primaryButton]}
+              onPress={() => router.push("/(tabs)/calendar")}
             >
               <Text style={[styles.buttonText, { color: colors.white }]}>
                 Book Appointment
@@ -69,6 +70,7 @@ export default function DoctorProfile() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, styles.outlineButton]}
+              onPress={() => router.push("/(tabs)/chat/conversation")}
             >
               <Text style={[styles.buttonText, { color: colors.primary }]}>
                 Message
@@ -85,32 +87,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    
-    
   },
 
   scrollContent: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 20,
     paddingHorizontal: 10,
   },
   contentWrapper: {
-    width: '100%',
+    width: "100%",
     maxWidth: 360,
-    alignItems: 'center',
+    alignItems: "center",
   },
   profileCard: {
     backgroundColor: colors.white,
     borderRadius: 16,
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
     shadowColor: colors.black,
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
     elevation: 3,
-    width: '100%',
+    width: "100%",
   },
   profileImage: {
     width: 120,
@@ -120,13 +120,13 @@ const styles = StyleSheet.create({
   },
   doctorName: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.textDark,
     marginBottom: 6,
   },
   specialty: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     color: colors.primary,
     marginBottom: 4,
   },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    width: '100%',
+    width: "100%",
     shadowColor: colors.black,
     shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 1 },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.textDark,
     marginBottom: 8,
   },
@@ -158,17 +158,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   buttonsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginTop: 20,
-    width: '100%',
+    width: "100%",
   },
   actionButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   primaryButton: {
     backgroundColor: colors.primary,
@@ -180,6 +180,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

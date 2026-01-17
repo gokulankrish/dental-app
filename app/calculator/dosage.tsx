@@ -520,7 +520,7 @@ export default function DosageCalculator() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={calculateDosage} activeOpacity={0.8}>
             <LinearGradient
-              colors={['#3b82f6', '#1d4ed8']}
+              colors={['#3b82f6', '#3b82f6']}
               style={styles.calculateButton}
             >
               <Calculator size={20} color="#fff" />
@@ -722,6 +722,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
+    
   },
   buttonText: {
     color: '#fff',

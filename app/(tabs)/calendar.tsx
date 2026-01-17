@@ -687,7 +687,7 @@ export default function CalendarScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>
           {isDoctor ? "Doctor Calendar" : "My Appointments"}
         </Text>
@@ -702,7 +702,7 @@ export default function CalendarScreen() {
             <Ionicons name="refresh-outline" size={24} color={Colors.white} />
           )}
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <ScrollView
         style={styles.scrollView}
