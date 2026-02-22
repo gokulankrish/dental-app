@@ -9,27 +9,50 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+ useEffect(() => {
+    console.log('Setting up auth listener');
+    let isMounted = true;
+
     const unsubscribe = AuthService.onAuthStateChange(async (authUser) => {
+      console.log('Auth state changed:', { 
+        hasUser: !!authUser, 
+        userId: authUser?.uid 
+      });
+      
+      if (!isMounted) return;
+      
       setUser(authUser);
       setError(null);
       
       if (authUser) {
         try {
+          console.log('Fetching user data for:', authUser.uid);
           const data = await AuthService.getCurrentUserData(authUser.uid);
-          setUserData(data);
+          console.log('User data fetched:', data);
+          if (isMounted) {
+            setUserData(data);
+          }
         } catch (err: any) {
           console.error('Error fetching user data:', err);
-          setError('Failed to load user data');
+          if (isMounted) {
+            setError('Failed to load user data');
+          }
         }
       } else {
-        setUserData(null);
+        if (isMounted) {
+          setUserData(null);
+        }
       }
       
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, userData: Partial<User>) => {
