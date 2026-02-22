@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+    marginTop: 20
   },
   contentContainer: {
     flexGrow: 1,
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
+    
   },
   title: {
     fontSize: 32,
@@ -107,6 +109,7 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     marginBottom: 8,
     textAlign: 'center',
+  
   },
   subtitle: {
     fontSize: 16,

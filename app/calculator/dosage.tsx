@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    paddingTop: 10,
+    paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },

@@ -352,12 +352,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 10,
     paddingBottom: 16,
     backgroundColor: '#0077B6',
   },
@@ -374,13 +375,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  subtitle: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-    marginVertical: 16,
-  },
+subtitle: {
+  fontFamily: 'Inter-Medium',
+  fontSize: 30,
+  color: '#0077B6', // Primary color
+  textAlign: 'center',
+  marginVertical: 20,
+  paddingBottom: 12,
+  borderBottomWidth: 2,
+  borderBottomColor: '#0077B6',
+  borderStyle: 'dashed', // or 'solid'
+  alignSelf: 'center',
+  paddingHorizontal: 10,
+},
   section: {
     backgroundColor: '#fff',
     borderRadius: 12,
