@@ -67,6 +67,11 @@
 // const CARD_HEIGHT = 170; // ✅ SAME HEIGHT FOR ALL
 // const SPACING = 17;
 
+// interface HealthCard {
+//   title: string;
+//   quote: string;
+//   tip: string;
+// }
 
 // export default function HomeScreen() {
 //   const router = useRouter();
@@ -79,24 +84,25 @@
 //     fetchNotifications();
 //   }, []);
 
-// const flatListRef = useRef(null);
-// const currentIndex = useRef(0);
+//   // Fixed: Properly typed ref for Animated.FlatList
+//   const flatListRef = useRef<Animated.FlatList<HealthCard>>(null);
+//   const currentIndex = useRef(0);
 
-// useEffect(() => {
-//   const interval = setInterval(() => {
-//     currentIndex.current =
-//       (currentIndex.current + 1) % HEALTH_CARDS.length;
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       currentIndex.current = (currentIndex.current + 1) % HEALTH_CARDS.length;
 
-//     flatListRef.current?.scrollToIndex({
-//       index: currentIndex.current,
-//       animated: true,
-//     });
-//   }, 30000); // ⏱ 30 seconds
+//       // Safe call with null check
+//       if (flatListRef.current) {
+//         flatListRef.current.scrollToIndex({
+//           index: currentIndex.current,
+//           animated: true,
+//         });
+//       }
+//     }, 30000); // ⏱ 30 seconds
 
-//   return () => clearInterval(interval);
-// }, []);
-
-
+//     return () => clearInterval(interval);
+//   }, []);
 
 //   const navigateToService = (service: string) => {
 //     alert(`${service} feature coming soon!`);
@@ -152,7 +158,6 @@
 //         </View>
 
 //         {/* Motivation & Health Tips Slider */}
-//         {/* Motivation & Health Tips Slider */}
 //         <View style={{ marginTop: 10, marginBottom: 20 }}>
 //           <Animated.FlatList
 //             ref={flatListRef}
@@ -196,28 +201,24 @@
 //           <ServiceCard
 //             title="Doctors"
 //             icon={<Stethoscope size={24} color={colors.primary} />}
-//             // onPress={() => navigateToService('Doctors')}
 //             onPress={() => router.push(`/doctor/doctors`)}
 //             style={styles.serviceCard}
 //           />
 //           <ServiceCard
 //             title="Pharmacy"
 //             icon={<Pill size={24} color={colors.secondary} />}
-//             // onPress={() => navigateToService('Pharmacy')}
 //             onPress={() => router.push(`/pharmacy/pharmacy`)}
 //             style={styles.serviceCard}
 //           />
 //           <ServiceCard
 //             title="Hospitals"
 //             icon={<Hospital size={24} color={colors.accent} />}
-//             // onPress={() => navigateToService('hospitals')}
 //             onPress={() => router.push(`/prescription/healthrecord`)}
 //             style={styles.serviceCard}
 //           />
 //           <ServiceCard
 //             title="Prescriptions"
 //             icon={<FileText size={24} color={colors.warning} />}
-//             // onPress={() => navigateToService('pescription')}
 //             onPress={() => router.push(`/prescription/prescription`)}
 //             style={styles.serviceCard}
 //           />
@@ -250,8 +251,6 @@
 //           <View style={styles.cardGrid}>
 //             <TouchableOpacity
 //               style={styles.featureCard}
-//               // onPress={() => router.push(`/`)}
-//               //  onPress={() => navigateToService('healthcheck')}
 //               onPress={() => router.push(`/calculator/checkup-page`)}
 //             >
 //               <View
@@ -280,7 +279,6 @@
 //             </TouchableOpacity>
 //             <TouchableOpacity
 //               style={styles.featureCard}
-//               // onPress={() => navigateToTool('Reminders')}
 //               onPress={() => router.push(`/calculator/reminder`)}
 //             >
 //               <View
@@ -528,46 +526,44 @@
 //   },
 
 //   gradientCard: {
-//   borderRadius: 18,
-//   padding: 18,
-// },
+//     borderRadius: 18,
+//     padding: 18,
+//   },
 
-// summaryTitle: {
-//   color: "#fff",
-//   fontSize: 18,
-//   fontWeight: "700",
-//   marginBottom: 6,
-// },
+//   summaryTitle: {
+//     color: "#fff",
+//     fontSize: 18,
+//     fontWeight: "700",
+//     marginBottom: 6,
+//   },
 
-// summarySubtitle: {
-//   color: "#fff",
-//   fontSize: 14,
-//   opacity: 0.9,
-//   lineHeight: 20,
-// },
+//   summarySubtitle: {
+//     color: "#fff",
+//     fontSize: 14,
+//     opacity: 0.9,
+//     lineHeight: 20,
+//   },
 
-// tipDivider: {
-//   height: 1,
-//   backgroundColor: "rgba(255,255,255,0.3)",
-//   marginVertical: 14,
-// },
+//   tipDivider: {
+//     height: 1,
+//     backgroundColor: "rgba(255,255,255,0.3)",
+//     marginVertical: 14,
+//   },
 
-// tipTitle: {
-//   color: "#fff",
-//   fontSize: 13,
-//   fontWeight: "600",
-//   marginBottom: 4,
-// },
+//   tipTitle: {
+//     color: "#fff",
+//     fontSize: 13,
+//     fontWeight: "600",
+//     marginBottom: 4,
+//   },
 
-// tipText: {
-//   color: "#fff",
-//   fontSize: 13,
-//   opacity: 0.9,
-//   lineHeight: 18,
-// },
-
+//   tipText: {
+//     color: "#fff",
+//     fontSize: 13,
+//     opacity: 0.9,
+//     lineHeight: 18,
+//   },
 // });
-
 
 import React, { useEffect, useRef } from "react";
 import {
@@ -581,6 +577,7 @@ import {
   TextInput,
   Animated,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -597,6 +594,9 @@ import {
   Apple,
   AlarmClock,
   ClipboardCheck,
+  Play,
+  Video,
+  BookOpen,
 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../constants/Colors";
@@ -635,14 +635,16 @@ const HEALTH_CARDS = [
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.89;
-const CARD_HEIGHT = 170; // ✅ SAME HEIGHT FOR ALL
+const CARD_HEIGHT = 170;
 const SPACING = 17;
+const VIDEO_CARD_WIDTH = width * 0.4;
 
 interface HealthCard {
   title: string;
   quote: string;
   tip: string;
 }
+
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -655,22 +657,20 @@ export default function HomeScreen() {
     fetchNotifications();
   }, []);
 
-  // Fixed: Properly typed ref for Animated.FlatList
-  const flatListRef = useRef<Animated.FlatList<HealthCard>>(null);
+  const flatListRef = useRef<FlatList<HealthCard>>(null);
   const currentIndex = useRef(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       currentIndex.current = (currentIndex.current + 1) % HEALTH_CARDS.length;
 
-      // Safe call with null check
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
           index: currentIndex.current,
           animated: true,
         });
       }
-    }, 30000); // ⏱ 30 seconds
+    }, 5000); // Changed to 5 seconds for better testing
 
     return () => clearInterval(interval);
   }, []);
@@ -683,9 +683,20 @@ export default function HomeScreen() {
     alert(`${tool} feature coming soon!`);
   };
 
+  const navigateToVideos = () => {
+    router.push("/videos/DentalVideosScreen");
+  };
+
+
+
+  const getItemLayout = (data: any, index: number) => ({
+    length: CARD_WIDTH + SPACING,
+    offset: (CARD_WIDTH + SPACING) * index,
+    index,
+  });
+
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-      {/* <StatusBar style="dark" /> */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
@@ -699,7 +710,7 @@ export default function HomeScreen() {
             <View>
               <Text style={styles.welcomeText}>Welcome back,</Text>
               <Text style={styles.userName}>
-                {user?.displayName || user?.displayName || "User"}
+                {user?.displayName || "User"}
               </Text>
             </View>
           </View>
@@ -730,7 +741,7 @@ export default function HomeScreen() {
 
         {/* Motivation & Health Tips Slider */}
         <View style={{ marginTop: 10, marginBottom: 20 }}>
-          <Animated.FlatList
+          <FlatList
             ref={flatListRef}
             data={HEALTH_CARDS}
             keyExtractor={(_, index) => index.toString()}
@@ -738,12 +749,14 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             snapToInterval={CARD_WIDTH + SPACING}
             decelerationRate="fast"
+            snapToAlignment="center"
             contentContainerStyle={{ paddingHorizontal: SPACING }}
+            getItemLayout={getItemLayout}
             renderItem={({ item }) => (
               <View
                 style={{
                   width: CARD_WIDTH,
-                  height: CARD_HEIGHT, // ✅ fixed size
+                  height: CARD_HEIGHT,
                   marginRight: SPACING,
                 }}
               >
@@ -863,6 +876,53 @@ export default function HomeScreen() {
               <Text style={styles.featureTitle}>Reminders</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Videos Section - Moved below Features */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Health Videos</Text>
+            <TouchableOpacity onPress={navigateToVideos}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {/* Featured Video Card */}
+          <TouchableOpacity 
+            style={styles.featuredVideoCard}
+            onPress={navigateToVideos}
+          >
+            <LinearGradient
+              colors={["#FF6B6B", "#FF8E8E"]}
+              style={styles.featuredVideoGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.featuredVideoContent}>
+                <View>
+                  <Text style={styles.featuredVideoTitle}>
+                    Video Library
+                  </Text>
+                  <Text style={styles.featuredVideoSubtitle}>
+                    Watch health tips & workouts
+                  </Text>
+                  <View style={styles.videoStats}>
+                    <Text style={styles.videoStatText}>
+                      • 45+ videos
+                    </Text>
+                    <Text style={styles.videoStatText}>
+                      • Updated weekly
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.playButton}>
+                  <Play size={24} color={colors.white} />
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Video Categories Horizontal List */}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -1067,9 +1127,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
-    elevation: 4, // for Android shadow
+    elevation: 4,
   },
-
   summaryStats: {
     flexDirection: "row",
     alignItems: "center",
@@ -1095,43 +1154,119 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.3)",
     marginHorizontal: 12,
   },
-
   gradientCard: {
     borderRadius: 18,
     padding: 18,
   },
-
   summaryTitle: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 6,
   },
-
   summarySubtitle: {
     color: "#fff",
     fontSize: 14,
     opacity: 0.9,
     lineHeight: 20,
   },
-
   tipDivider: {
     height: 1,
     backgroundColor: "rgba(255,255,255,0.3)",
     marginVertical: 14,
   },
-
   tipTitle: {
     color: "#fff",
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 4,
   },
-
   tipText: {
     color: "#fff",
     fontSize: 13,
     opacity: 0.9,
     lineHeight: 18,
+  },
+  // Video section styles
+  videoList: {
+    paddingRight: 16,
+  },
+  videoCard: {
+    width: VIDEO_CARD_WIDTH,
+    marginRight: 12,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: colors.white,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  videoThumbnail: {
+    width: "100%",
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  videoInfo: {
+    padding: 12,
+  },
+  videoTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.textDark,
+    marginBottom: 4,
+  },
+  videoCount: {
+    fontSize: 12,
+    color: colors.textLight,
+  },
+  featuredVideoCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 16,
+  },
+  featuredVideoGradient: {
+    padding: 20,
+  },
+  featuredVideoContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  featuredVideoTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.white,
+    marginBottom: 4,
+  },
+  featuredVideoSubtitle: {
+    fontSize: 14,
+    color: colors.white,
+    opacity: 0.9,
+    marginBottom: 8,
+  },
+  videoStats: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  videoStatText: {
+    fontSize: 12,
+    color: colors.white,
+    opacity: 0.8,
+  },
+  playButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

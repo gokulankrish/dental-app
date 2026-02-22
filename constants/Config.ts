@@ -1,4 +1,5 @@
 // constants/Config.ts
+
 const firebaseConfig = {
   apiKey: "AIzaSyBaja9Oaus9kobKh5gCcs_4Zw0n2o01CZ4",
   authDomain: "dental-chat-app-2a7fd.firebaseapp.com",

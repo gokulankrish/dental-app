@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Aafirin-dental-care",
-    "slug": "Aafirin-dental-care",
+    "slug": "aafirin-dental-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo-image.png",
@@ -24,7 +24,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gokukrishnasorganization.aafirindentalapp"
+      "package": "com.gokukrishnasorganization.aafirindentalapp",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE"
+      ]
     },
     "web": {
       "output": "static",
@@ -58,3 +63,4 @@
     "owner": "gokukrishnas-organization"
   }
 }
+
